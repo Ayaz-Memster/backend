@@ -8,7 +8,7 @@ services:
     ports:
       - 3000:3000
     labels:
-      - traefik.http.routers.ayaz-memster-backend.rule=Host(`ayaz-memster.okinazuno.me`) && Path(`/api`)
+      - traefik.http.routers.ayaz-memster-backend.rule=Host(`ayaz-memster.okinazuno.me`) && PathPrefix(`/api`)
       - traefik.http.routers.ayaz-memster-backend.tls=true
       - traefik.http.routers.ayaz-memster-backend.tls.certresolver=letsEncrypt
       - traefik.http.services.ayaz-memster-backend.loadbalancer.server.port=3000
