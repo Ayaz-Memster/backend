@@ -12,6 +12,10 @@ services:
       - traefik.http.routers.ayaz-memster-frontend.tls=true
       - traefik.http.routers.ayaz-memster-frontend.tls.certresolver=letsEncrypt
       - traefik.http.services.ayaz-memster-frontend.loadbalancer.server.port=3000
+    environment:
+      - DB_URL=${DB_URL}
+      - DB_DATABASE=${DB_DATABASE}
+      - NODE_ENV=production
 
 networks:
   default:
