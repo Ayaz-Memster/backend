@@ -1,10 +1,10 @@
-import { Injectable, OnModuleDestroy, Scope } from '@nestjs/common';
+import { Injectable, Scope } from '@nestjs/common';
 import { IDocumentSession } from 'ravendb';
 import { RavenService } from 'src/services/raven/raven.service';
 import { ImageDto } from 'src/contract/image';
 import { Image } from 'src/domain/image';
 import { AlreadyExistsError } from 'src/errors/AlreadyExistsError';
-import { PassThrough, Stream } from 'stream';
+import { PassThrough } from 'stream';
 
 @Injectable({ scope: Scope.REQUEST })
 export class ImageRepository {
