@@ -1,0 +1,85 @@
+name: Docker
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    name: Define changes
+    outputs:
+      source: ${{ steps.filter.outputs.source }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            source:
+              - src/**
+              - package.json
+              - tsconfig.json
+              - tsconfig.build.json
+              - nest-cli.json
+  build:
+    needs: changes
+    if: ${{ needs.changes.outputs.source == 'true' }}
+    runs-on: ubuntu-latest
+    name: Build and push docker images
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Login to Docker Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{github.actor}}
+          password: ${{secrets.GITHUB_TOKEN}}
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Build image
+        uses: docker/build-push-action@master
+        with:
+          push: true
+          tags: ghcr.io/ayaz-memster/backend:${{ github.sha }},ghcr.io/ayaz-memster/backend:latest
+  deploy:
+    runs-on: ubuntu-latest
+    if: always()
+    needs:
+      - changes
+      - build
+    name: Deploy containers to Azure Virtual Machine
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Copy yaml scripts to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USERNAME }}
+          key: ${{ secrets.VM_SSH_PRIVATE_KEY }}
+          target: '/docker/ayaz-memster-backend/'
+          overwrite: true
+          source: 'docker-compose.yaml'
+      - name: Define version
+        uses: haya14busa/action-cond@v1
+        id: version
+        with:
+          cond: ${{ needs.changes.outputs.source == 'true' }}
+          if_true: ${{ github.sha }}
+          if_false: 'latest'
+      - name: Docker Compose Up
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USERNAME }}
+          key: ${{ secrets.VM_SSH_PRIVATE_KEY }}
+          script: |
+            docker login ghcr.io --username ${{github.actor}} --password ${{secrets.GITHUB_TOKEN}}
+            cd /docker/ayaz-memster-backend
+            export IMAGE_VERSION=${{ steps.version.outputs.value }}
+            export DB_URL=${{ secrets.DB_URL }}
+            export DB_DATABASE=${{ secrets.DB_DATABASE }}
+            docker-compose up -d
+            docker image prune -a -f
