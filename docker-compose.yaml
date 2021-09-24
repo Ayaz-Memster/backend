@@ -1,6 +1,6 @@
 version: '3.8'
 services:
-  frontend:
+  backend:
     container_name: ayaz-memster-backend
     restart: always
     image: ghcr.io/ayaz-memster/backend:${IMAGE_VERSION}
