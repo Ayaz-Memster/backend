@@ -5,8 +5,8 @@ const previewSize = 300;
 
 @Injectable()
 export class ImageEditorService {
-  async toWebp(buffer: Buffer): Promise<Buffer> {
-    return sharp(buffer, { animated: true })
+  async toWebp(buffer: Buffer, isAnimated: boolean): Promise<Buffer> {
+    return sharp(buffer, { animated: isAnimated })
       .webp({ lossless: true })
       .toBuffer();
   }
@@ -25,5 +25,9 @@ export class ImageEditorService {
       .resize(previewSize, previewSize)
       .webp({ lossless: true })
       .toBuffer();
+  }
+
+  async toPng(buffer: Buffer): Promise<Buffer> {
+    return sharp(buffer).png().toBuffer();
   }
 }

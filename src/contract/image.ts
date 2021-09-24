@@ -1,7 +1,6 @@
 export type ImageDto = {
   name: string;
   uploadDateTime: string;
-  extension: string;
 };
 
 export type AddImageDto = {
