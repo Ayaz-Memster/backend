@@ -27,6 +27,13 @@ export class ApiController {
     private readonly imageEditor: ImageEditorService
   ) {}
 
+  @Get('images')
+  async getImages(
+    @Query('search') search: string | undefined
+  ): Promise<ImageDto[]> {
+    return this.imageRepository.getImagesList(search ?? '');
+  }
+
   @Get('download/:name')
   async downloadImage(
     @Param('name') name: string,
@@ -59,13 +66,6 @@ export class ApiController {
       image = await this.imageRepository.getPreview(name);
     }
     return new StreamableFile(image);
-  }
-
-  @Get()
-  async getImages(
-    @Query('search') search: string | undefined
-  ): Promise<ImageDto[]> {
-    return this.imageRepository.getImagesList(search ?? '');
   }
 
   @Post()
