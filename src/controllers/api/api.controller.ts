@@ -88,6 +88,9 @@ export class ApiController {
           responseType: 'stream',
         })
       );
+      if (response.status > 300) {
+        throw new Error(JSON.stringify(response.data));
+      }
       buffer = response.data;
       contentType = response.headers['content-type'];
     }
