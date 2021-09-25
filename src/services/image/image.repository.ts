@@ -5,7 +5,6 @@ import { ImageDto } from 'src/contract/image';
 import { Image } from 'src/domain/image';
 import { AlreadyExistsError } from 'src/errors/AlreadyExistsError';
 import { PassThrough, Readable } from 'stream';
-import { buffer } from 'stream/consumers';
 
 @Injectable({ scope: Scope.REQUEST })
 export class ImageRepository {
@@ -83,6 +82,15 @@ export class ImageRepository {
       });
   }
 
+  async getOriginal(name: string): Promise<Buffer> {
+    return this.session.advanced.attachments
+      .get(name, 'original')
+      .then((result) => {
+        const stream = result.data as PassThrough;
+        return this.streamToBuffer(stream);
+      });
+  }
+
   private streamToBuffer(stream: Readable): Promise<Buffer> {
     const buffer: Uint8Array[] = [];
     stream.on('data', (chunk) => {
@@ -99,29 +107,6 @@ export class ImageRepository {
         res(Buffer.concat(buffer));
       });
     });
-  }
-
-  async getOriginal(name: string): Promise<Buffer> {
-    return this.session.advanced.attachments
-      .get(name, 'original')
-      .then((result) => {
-        const buffer: Uint8Array[] = [];
-        const data = result.data as PassThrough;
-        data.on('readable', () => {
-          while (true) {
-            const chunk = data.read();
-            if (!chunk) {
-              break;
-            }
-            buffer.push(chunk);
-          }
-        });
-        return new Promise((res) => {
-          data.on('end', () => {
-            res(Buffer.concat(buffer));
-          });
-        });
-      });
   }
 
   async saveChanges() {
