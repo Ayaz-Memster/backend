@@ -4,6 +4,7 @@ import {
   ExceptionFilter,
   HttpStatus,
 } from '@nestjs/common';
+import { Error } from 'src/contract/error';
 
 @Catch()
 export class ExceptionsFilter implements ExceptionFilter {
@@ -24,11 +25,13 @@ export class ExceptionsFilter implements ExceptionFilter {
       }
     }
 
-    response.status(status).json({
+    const error: Error = {
       statusCode: status,
       timestamp: new Date().toISOString(),
       path: request.url,
       message,
-    });
+    };
+
+    response.status(status).json(error);
   }
 }
