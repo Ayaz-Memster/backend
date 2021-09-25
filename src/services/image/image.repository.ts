@@ -4,7 +4,8 @@ import { RavenService } from 'src/services/raven/raven.service';
 import { ImageDto } from 'src/contract/image';
 import { Image } from 'src/domain/image';
 import { AlreadyExistsError } from 'src/errors/AlreadyExistsError';
-import { PassThrough } from 'stream';
+import { PassThrough, Readable } from 'stream';
+import { buffer } from 'stream/consumers';
 
 @Injectable({ scope: Scope.REQUEST })
 export class ImageRepository {
@@ -14,11 +15,12 @@ export class ImageRepository {
     this.session = ravenService.openSession();
   }
 
-  async getImagesList(search: string): Promise<ImageDto[]> {
-    const images = await this.session
-      .query<Image>({})
-      .whereRegex('name', search)
-      .all();
+  async getImagesList(search?: string): Promise<ImageDto[]> {
+    let query = this.session.query<Image>({});
+    if (search) {
+      query = query.whereRegex('name', search);
+    }
+    const images = await query.orderByDescending('uploadDateTime').all();
 
     return images.map((item) => ({
       name: item.name,
@@ -45,7 +47,7 @@ export class ImageRepository {
 
     const image: Image = {
       name,
-      uploadDateTime: new Date().toISOString(),
+      uploadDateTime: new Date().getTime(),
       isAnimated,
     };
     await this.session.store(image, name);
@@ -67,22 +69,8 @@ export class ImageRepository {
     return this.session.advanced.attachments
       .get(name, 'image')
       .then((result) => {
-        const buffer: Uint8Array[] = [];
-        const data = result.data as PassThrough;
-        data.on('readable', () => {
-          while (true) {
-            const chunk = data.read();
-            if (!chunk) {
-              break;
-            }
-            buffer.push(chunk);
-          }
-        });
-        return new Promise((res) => {
-          data.on('end', () => {
-            res(Buffer.concat(buffer));
-          });
-        });
+        const stream = result.data as PassThrough;
+        return this.streamToBuffer(stream);
       });
   }
 
@@ -90,23 +78,27 @@ export class ImageRepository {
     return this.session.advanced.attachments
       .get(name, 'preview')
       .then((result) => {
-        const buffer: Uint8Array[] = [];
-        const data = result.data as PassThrough;
-        data.on('readable', () => {
-          while (true) {
-            const chunk = data.read();
-            if (!chunk) {
-              break;
-            }
-            buffer.push(chunk);
-          }
-        });
-        return new Promise((res) => {
-          data.on('end', () => {
-            res(Buffer.concat(buffer));
-          });
-        });
+        const stream = result.data as PassThrough;
+        return this.streamToBuffer(stream);
       });
+  }
+
+  private streamToBuffer(stream: Readable): Promise<Buffer> {
+    const buffer: Uint8Array[] = [];
+    stream.on('data', (chunk) => {
+      buffer.push(chunk);
+    });
+    stream.on('readable', () => {
+      stream.read();
+    });
+    return new Promise((res, rej) => {
+      stream.on('error', (err) => {
+        rej(err);
+      });
+      stream.on('end', () => {
+        res(Buffer.concat(buffer));
+      });
+    });
   }
 
   async getOriginal(name: string): Promise<Buffer> {

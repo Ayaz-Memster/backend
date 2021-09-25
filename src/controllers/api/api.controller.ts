@@ -31,7 +31,7 @@ export class ApiController {
   async getImages(
     @Query('search') search: string | undefined
   ): Promise<ImageDto[]> {
-    return this.imageRepository.getImagesList(search ?? '');
+    return this.imageRepository.getImagesList(search);
   }
 
   @Get('download/:name')

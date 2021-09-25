@@ -1,6 +1,6 @@
 export type ImageDto = {
   name: string;
-  uploadDateTime: string;
+  uploadDateTime: number;
 };
 
 export type AddImageDto = {

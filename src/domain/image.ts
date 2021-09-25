@@ -1,5 +1,5 @@
 export type Image = {
   name: string;
-  uploadDateTime: string;
+  uploadDateTime: number;
   isAnimated: boolean;
 };
