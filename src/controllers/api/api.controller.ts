@@ -68,7 +68,7 @@ export class ApiController {
     return new StreamableFile(image);
   }
 
-  @Post()
+  @Post('image')
   @UseInterceptors(FileInterceptor('file'))
   async addImage(
     @Body() addImageDto: AddImageDto,
