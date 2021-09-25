@@ -12,6 +12,8 @@ services:
       - traefik.http.routers.ayaz-memster-backend.tls=true
       - traefik.http.routers.ayaz-memster-backend.tls.certresolver=letsEncrypt
       - traefik.http.services.ayaz-memster-backend.loadbalancer.server.port=3000
+      - traefik.http.middlewares.ayaz-memster-backend.ratelimit.average=100
+      - traefik.http.middlewares.ayaz-memster-backend.ratelimit.burst=50
     environment:
       - DB_URL=${DB_URL}
       - DB_DATABASE=${DB_DATABASE}
