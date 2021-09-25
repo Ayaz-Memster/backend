@@ -97,12 +97,20 @@ export class ApiController {
     const isAnimated = this.checkAnimation(contentType);
     await this.imageRepository.addImage(addImageDto.name, isAnimated);
     const image = await this.imageEditor.toWebp(buffer, isAnimated);
-    const preview = await this.imageEditor.crop(image, {
-      x: parseFloat(addImageDto.x),
-      y: parseFloat(addImageDto.y),
-      width: parseFloat(addImageDto.width),
-      height: parseFloat(addImageDto.height),
-    });
+    const preview = await this.imageEditor.crop(
+      image,
+      addImageDto.x !== undefined &&
+        addImageDto.y !== undefined &&
+        addImageDto.width &&
+        addImageDto.height
+        ? {
+            x: parseFloat(addImageDto.x),
+            y: parseFloat(addImageDto.y),
+            width: parseFloat(addImageDto.width),
+            height: parseFloat(addImageDto.height),
+          }
+        : undefined
+    );
     this.imageRepository.attachImage(addImageDto.name, image);
     this.imageRepository.attachPreview(addImageDto.name, preview);
     if (isAnimated) {

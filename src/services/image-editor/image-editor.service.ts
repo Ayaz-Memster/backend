@@ -13,16 +13,26 @@ export class ImageEditorService {
 
   async crop(
     buffer: Buffer,
-    crop: { x: number; y: number; width: number; height: number }
+    crop?: { x: number; y: number; width: number; height: number }
   ): Promise<Buffer> {
+    if (crop) {
+      return sharp(buffer)
+        .extract({
+          left: crop.x,
+          top: crop.y,
+          width: crop.width,
+          height: crop.height,
+        })
+        .resize(previewSize, previewSize)
+        .webp({ lossless: true })
+        .toBuffer();
+    }
     return sharp(buffer)
-      .extract({
-        left: crop.x,
-        top: crop.y,
-        width: crop.width,
-        height: crop.height,
+      .resize({
+        fit: 'cover',
+        height: previewSize,
+        width: previewSize,
       })
-      .resize(previewSize, previewSize)
       .webp({ lossless: true })
       .toBuffer();
   }

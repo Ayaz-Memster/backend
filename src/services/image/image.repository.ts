@@ -34,7 +34,7 @@ export class ImageRepository {
       .then((res) => res.isAnimated);
   }
 
-  async addImage(name: string, isAnimated: boolean) {
+  async addImage(name: string, isAnimated: boolean, timestamp?: number) {
     const imageExists = await this.session
       .query({})
       .whereEquals('id', name)
