@@ -15,6 +15,7 @@ export class ExceptionsFilter implements ExceptionFilter {
     let message: string = 'Internal server error';
 
     if (exception instanceof Error) {
+      console.error(exception.name, exception.message);
       switch (exception.name) {
         case 'AlreadyExistsError':
           status = HttpStatus.BAD_REQUEST;

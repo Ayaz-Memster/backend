@@ -6,7 +6,7 @@ import { DocumentStore, IDocumentSession } from 'ravendb';
 export class RavenService {
   private readonly store: DocumentStore;
 
-  constructor(private configService: ConfigService) {
+  constructor(configService: ConfigService) {
     const dbUrl = configService.get('DB_URL');
     if (!dbUrl) {
       throw new Error('DB_URL is not provided');
