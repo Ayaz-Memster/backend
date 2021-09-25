@@ -85,7 +85,7 @@ export class ApiController {
       }
       const response = await firstValueFrom(
         this.httpService.get(addImageDto.link, {
-          responseType: 'stream',
+          responseType: 'arraybuffer',
         })
       );
       if (response.status > 300) {
