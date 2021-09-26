@@ -34,6 +34,11 @@ export class ApiController {
     return this.imageRepository.getImagesList(search);
   }
 
+  @Get('image/:name')
+  async getImageInfo(@Param('name') name: string): Promise<ImageDto> {
+    return this.imageRepository.getImage(name);
+  }
+
   @Get('download/:name')
   async downloadImage(
     @Param('name') name: string,
@@ -43,12 +48,12 @@ export class ApiController {
 
     if (isAnimated) {
       response.contentType('image/gif');
-      const image = await this.imageRepository.getOriginal(name);
+      const image = await this.imageRepository.getOriginalBuffer(name);
       response.send(image);
       return;
     }
     response.contentType('image/png');
-    const image = await this.imageRepository.getImage(name);
+    const image = await this.imageRepository.getImageBuffer(name);
     const png = await this.imageEditor.toPng(image);
     response.send(png);
   }
@@ -61,9 +66,9 @@ export class ApiController {
   ): Promise<StreamableFile> {
     let image: Buffer;
     if (isPreview !== 'true') {
-      image = await this.imageRepository.getImage(name);
+      image = await this.imageRepository.getImageBuffer(name);
     } else {
-      image = await this.imageRepository.getPreview(name);
+      image = await this.imageRepository.getPreviewBuffer(name);
     }
     return new StreamableFile(image);
   }

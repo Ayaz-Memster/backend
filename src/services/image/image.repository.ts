@@ -5,6 +5,7 @@ import { ImageDto } from 'src/contract/image';
 import { Image } from 'src/domain/image';
 import { AlreadyExistsError } from 'src/errors/AlreadyExistsError';
 import { PassThrough, Readable } from 'stream';
+import { NotFoundError } from 'src/errors/NotFoundError';
 
 @Injectable({ scope: Scope.REQUEST })
 export class ImageRepository {
@@ -21,10 +22,18 @@ export class ImageRepository {
     }
     const images = await query.orderByDescending('uploadDateTime').all();
 
-    return images.map((item) => ({
-      name: item.name,
-      uploadDateTime: item.uploadDateTime,
-    }));
+    return images.map(this.mapImage);
+  }
+
+  async getImage(name: string): Promise<ImageDto> {
+    const image = await this.session
+      .query<Image>({})
+      .whereEquals('id', name)
+      .singleOrNull();
+    if (!image) {
+      throw new NotFoundError(`${name} image not found`);
+    }
+    return this.mapImage(image);
   }
 
   async checkAnimation(name: string): Promise<boolean> {
@@ -64,7 +73,7 @@ export class ImageRepository {
     this.session.advanced.attachments.store(name, 'preview', buffer);
   }
 
-  async getImage(name: string): Promise<Buffer> {
+  async getImageBuffer(name: string): Promise<Buffer> {
     return this.session.advanced.attachments
       .get(name, 'image')
       .then((result) => {
@@ -73,7 +82,7 @@ export class ImageRepository {
       });
   }
 
-  async getPreview(name: string): Promise<Buffer> {
+  async getPreviewBuffer(name: string): Promise<Buffer> {
     return this.session.advanced.attachments
       .get(name, 'preview')
       .then((result) => {
@@ -82,7 +91,7 @@ export class ImageRepository {
       });
   }
 
-  async getOriginal(name: string): Promise<Buffer> {
+  async getOriginalBuffer(name: string): Promise<Buffer> {
     return this.session.advanced.attachments
       .get(name, 'original')
       .then((result) => {
@@ -107,6 +116,13 @@ export class ImageRepository {
         res(Buffer.concat(buffer));
       });
     });
+  }
+
+  private mapImage(image: Image): ImageDto {
+    return {
+      name: image.name,
+      uploadDateTime: image.uploadDateTime,
+    };
   }
 
   async saveChanges() {
