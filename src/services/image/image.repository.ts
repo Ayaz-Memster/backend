@@ -2,7 +2,7 @@ import { Injectable, Scope } from '@nestjs/common';
 import { IDocumentSession } from 'ravendb';
 import { RavenService } from 'src/services/raven/raven.service';
 import { ImageDto } from 'src/contract/image';
-import { Image } from 'src/domain/image';
+import { Image, imagesCollection } from 'src/domain/image';
 import { AlreadyExistsError } from 'src/errors/AlreadyExistsError';
 import { PassThrough, Readable } from 'stream';
 import { NotFoundError } from 'src/errors/NotFoundError';
@@ -16,7 +16,7 @@ export class ImageRepository {
   }
 
   async getImagesList(search?: string): Promise<ImageDto[]> {
-    let query = this.session.query<Image>({});
+    let query = this.query;
     if (search) {
       query = query.whereRegex('name', search);
     }
@@ -26,10 +26,8 @@ export class ImageRepository {
   }
 
   async getImage(name: string): Promise<ImageDto> {
-    const image = await this.session
-      .query<Image>({})
-      .whereEquals('id', name)
-      .singleOrNull();
+    const image = await this.query.whereEquals('id', name).singleOrNull();
+
     if (!image) {
       throw new NotFoundError(`${name} image not found`);
     }
@@ -37,18 +35,14 @@ export class ImageRepository {
   }
 
   async checkAnimation(name: string): Promise<boolean> {
-    return this.session
-      .query<Image>({})
+    return this.query
       .whereEquals('id', name)
       .single()
       .then((res) => res.isAnimated);
   }
 
   async addImage(name: string, isAnimated: boolean, timestamp?: number) {
-    const imageExists = await this.session
-      .query({})
-      .whereEquals('id', name)
-      .any();
+    const imageExists = await this.query.whereEquals('id', name).any();
     if (imageExists) {
       throw new AlreadyExistsError('Image already exists');
     }
@@ -57,6 +51,7 @@ export class ImageRepository {
       name,
       uploadDateTime: new Date().getTime(),
       isAnimated,
+      collection: imagesCollection,
     };
     await this.session.store(image, name);
   }
@@ -116,6 +111,10 @@ export class ImageRepository {
         res(Buffer.concat(buffer));
       });
     });
+  }
+
+  private get query() {
+    return this.session.query<Image>({});
   }
 
   private mapImage(image: Image): ImageDto {

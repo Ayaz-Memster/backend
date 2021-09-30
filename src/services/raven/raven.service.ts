@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { DocumentStore, IDocumentSession } from 'ravendb';
+import { DocumentConventions, DocumentStore, IDocumentSession } from 'ravendb';
 
 @Injectable()
 export class RavenService {
@@ -16,6 +16,9 @@ export class RavenService {
       throw new Error('DB_DATABASE is not provided');
     }
     this.store = new DocumentStore(dbUrl, dbDatabase);
+    this.store.conventions.findCollectionNameForObjectLiteral = (entity) => {
+      return entity['collection'];
+    };
     this.store.initialize();
   }
 
