@@ -22,6 +22,25 @@ export class ExceptionsFilter implements ExceptionFilter {
           status = HttpStatus.BAD_REQUEST;
           message = exception.message;
           break;
+        case 'InvalidArgumentError':
+          status = HttpStatus.BAD_REQUEST;
+          message = exception.message;
+          break;
+        case 'NotFoundError':
+          status = HttpStatus.NOT_FOUND;
+          message = exception.message;
+          break;
+        case 'UnauthorizedError':
+          status = HttpStatus.UNAUTHORIZED;
+          message = exception.message;
+          break;
+        case 'WrongPasswordError':
+          status = HttpStatus.UNAUTHORIZED;
+          message = exception.message;
+          break;
+        case 'UnauthorizedException':
+          status = HttpStatus.UNAUTHORIZED;
+          message = 'Authentication required';
       }
     }
 
