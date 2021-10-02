@@ -58,6 +58,11 @@ export class UserController {
     res.cookie('access_token', token, { httpOnly: true, maxAge: 604800000 });
   }
 
+  @Get('logout')
+  logout(@Res({ passthrough: true }) res: Response): void {
+    res.clearCookie('access_token');
+  }
+
   @Get()
   @UseGuards(AuthGuard('jwt'))
   async getUser(@Req() req: Request): Promise<UserDto> {
