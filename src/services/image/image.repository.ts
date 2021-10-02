@@ -35,10 +35,11 @@ export class ImageRepository {
   }
 
   async checkAnimation(name: string): Promise<boolean> {
-    return this.query
-      .whereEquals('id', name)
-      .single()
-      .then((res) => res.isAnimated);
+    const image = await this.query.whereEquals('id', name).singleOrNull();
+    if (image === null) {
+      throw new NotFoundError('Image not found');
+    }
+    return image.isAnimated;
   }
 
   async addImage(name: string, isAnimated: boolean, timestamp?: number) {
@@ -72,6 +73,9 @@ export class ImageRepository {
     return this.session.advanced.attachments
       .get(name, 'image')
       .then((result) => {
+        if (!result) {
+          throw new NotFoundError('Image not found');
+        }
         const stream = result.data as PassThrough;
         return this.streamToBuffer(stream);
       });
@@ -81,6 +85,9 @@ export class ImageRepository {
     return this.session.advanced.attachments
       .get(name, 'preview')
       .then((result) => {
+        if (!result) {
+          throw new NotFoundError('Preview not found');
+        }
         const stream = result.data as PassThrough;
         return this.streamToBuffer(stream);
       });
@@ -90,6 +97,9 @@ export class ImageRepository {
     return this.session.advanced.attachments
       .get(name, 'original')
       .then((result) => {
+        if (!result) {
+          throw new NotFoundError('Original not found');
+        }
         const stream = result.data as PassThrough;
         return this.streamToBuffer(stream);
       });

@@ -53,9 +53,9 @@ export class UserController {
       username: username,
     };
     const token = this.jwtService.sign(userPayload, {
-      expiresIn: '1d',
+      expiresIn: '7d',
     });
-    res.cookie('access_token', token, { httpOnly: true });
+    res.cookie('access_token', token, { httpOnly: true, maxAge: 604800000 });
   }
 
   @Get()

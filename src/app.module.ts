@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { RavenService } from './services/raven/raven.service';
 import { ApiController } from './controllers/api/api.controller';
 import { ImageRepository } from './services/image/image.repository';
@@ -11,6 +11,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
 import { AuthService } from './services/auth/auth.service';
 import { PassportModule } from '@nestjs/passport';
+import { APP_FILTER } from '@nestjs/core';
+import { ExceptionsFilter } from './filter/exceptions.filter';
 
 @Module({
   imports: [
@@ -36,6 +38,11 @@ import { PassportModule } from '@nestjs/passport';
     UserRepository,
     JwtStrategy,
     AuthService,
+    Logger,
+    {
+      provide: APP_FILTER,
+      useClass: ExceptionsFilter,
+    },
   ],
 })
 export class AppModule {}
