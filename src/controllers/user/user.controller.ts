@@ -8,9 +8,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserDto, UserPayload } from 'src/contract/user';
-import { InvalidArgumentError } from 'src/errors/InvalidArgumentError';
-import { AuthService } from 'src/services/auth/auth.service';
+import { UserDto, UserPayload } from '../../contract/user';
+import { InvalidArgumentError } from '../../errors/InvalidArgumentError';
+import { AuthService } from '../../services/auth/auth.service';
 import { Response, Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 

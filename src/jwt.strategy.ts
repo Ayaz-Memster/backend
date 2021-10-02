@@ -12,7 +12,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       ignoreExpiration: false,
       secretOrKey: configService.get('JWT_SECRET'),
       jwtFromRequest: (request: Request) => {
-        let data = request?.cookies['access_token'];
+        let data = request?.cookies?.['access_token'];
         if (!data) {
           return null;
         }

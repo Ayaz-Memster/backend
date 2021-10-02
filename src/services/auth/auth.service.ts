@@ -1,9 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { createHash } from 'crypto';
-import { UserDto } from 'src/contract/user';
-import { AlreadyExistsError } from 'src/errors/AlreadyExistsError';
-import { UserRepository } from 'src/services/user/user.repository';
+import { UserDto } from '../../contract/user';
+import { UserRepository } from '../../services/user/user.repository';
 
 @Injectable()
 export class AuthService {

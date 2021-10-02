@@ -10,16 +10,19 @@ import {
   Res,
   StreamableFile,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { firstValueFrom } from 'rxjs';
-import { AddImageDto, ImageDto } from 'src/contract/image';
-import { ImageEditorService } from 'src/services/image-editor/image-editor.service';
-import { ImageRepository } from 'src/services/image/image.repository';
+import { AddImageDto, ImageDto } from '../../contract/image';
+import { ImageEditorService } from '../../services/image-editor/image-editor.service';
+import { ImageRepository } from '../../services/image/image.repository';
 
 @Controller('api')
+@UseGuards(AuthGuard('jwt'))
 export class ApiController {
   constructor(
     private readonly imageRepository: ImageRepository,

@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { IDocumentSession } from 'ravendb';
-import { UserDto } from 'src/contract/user';
-import { User, usersCollection } from 'src/domain/user';
-import { AlreadyExistsError } from 'src/errors/AlreadyExistsError';
-import { NotFoundError } from 'src/errors/NotFoundError';
-import { UnauthorizedError } from 'src/errors/UnauthorizedError';
-import { WrongPasswordError } from 'src/errors/WrongPasswordError';
-import { RavenService } from 'src/services/raven/raven.service';
+import { UserDto } from '../../contract/user';
+import { User, usersCollection } from '../../domain/user';
+import { AlreadyExistsError } from '../../errors/AlreadyExistsError';
+import { NotFoundError } from '../../errors/NotFoundError';
+import { UnauthorizedError } from '../../errors/UnauthorizedError';
+import { WrongPasswordError } from '../../errors/WrongPasswordError';
+import { RavenService } from '../../services/raven/raven.service';
 
 @Injectable()
 export class UserRepository {

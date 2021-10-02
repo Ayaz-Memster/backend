@@ -1,11 +1,11 @@
 import { Injectable, Scope } from '@nestjs/common';
 import { IDocumentSession } from 'ravendb';
-import { RavenService } from 'src/services/raven/raven.service';
-import { ImageDto } from 'src/contract/image';
-import { Image, imagesCollection } from 'src/domain/image';
-import { AlreadyExistsError } from 'src/errors/AlreadyExistsError';
+import { RavenService } from '../../services/raven/raven.service';
+import { ImageDto } from '../../contract/image';
+import { Image, imagesCollection } from '../../domain/image';
+import { AlreadyExistsError } from '../../errors/AlreadyExistsError';
 import { PassThrough, Readable } from 'stream';
-import { NotFoundError } from 'src/errors/NotFoundError';
+import { NotFoundError } from '../../errors/NotFoundError';
 
 @Injectable({ scope: Scope.REQUEST })
 export class ImageRepository {
