@@ -82,5 +82,6 @@ jobs:
             export IMAGE_VERSION=${{ steps.version.outputs.value }}
             export DB_URL=${{ secrets.DB_URL }}
             export DB_DATABASE=${{ secrets.DB_DATABASE }}
+            export JWT_SECRET=${{ secrets.JWT_SECRET }}
             docker-compose up -d
             docker image prune -a -f
