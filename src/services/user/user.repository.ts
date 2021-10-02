@@ -52,7 +52,10 @@ export class UserRepository {
   async getUser(username: string): Promise<UserDto> {
     const user = await this.collection
       .whereEquals('username', username)
-      .single();
+      .singleOrNull();
+    if (user === null) {
+      throw new NotFoundError('User not found');
+    }
     return {
       username: user.username,
       canEdit: user.canEdit,
