@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Scope } from '@nestjs/common';
 import { IDocumentSession } from 'ravendb';
 import { UserDto } from '../../contract/user';
 import { User, usersCollection } from '../../domain/user';
@@ -8,7 +8,7 @@ import { UnauthorizedError } from '../../errors/UnauthorizedError';
 import { WrongPasswordError } from '../../errors/WrongPasswordError';
 import { RavenService } from '../../services/raven/raven.service';
 
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class UserRepository {
   private readonly session: IDocumentSession;
 
