@@ -60,6 +60,8 @@ export class UserRepository {
   }
 
   private get collection() {
-    return this.session.query<User>({ collection: usersCollection });
+    return this.session
+      .query<User>({ collection: usersCollection })
+      .noCaching();
   }
 }
