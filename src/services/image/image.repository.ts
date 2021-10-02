@@ -124,7 +124,7 @@ export class ImageRepository {
   }
 
   private get query() {
-    return this.session.query<Image>({});
+    return this.session.query<Image>({ collection: imagesCollection });
   }
 
   private mapImage(image: Image): ImageDto {
