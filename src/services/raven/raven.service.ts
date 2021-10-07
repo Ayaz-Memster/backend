@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { DocumentConventions, DocumentStore, IDocumentSession } from 'ravendb';
+import { readFileSync } from 'fs';
+import { DocumentStore, IDocumentSession } from 'ravendb';
 
 @Injectable()
 export class RavenService {
@@ -15,7 +16,15 @@ export class RavenService {
     if (!dbDatabase) {
       throw new Error('DB_DATABASE is not provided');
     }
-    this.store = new DocumentStore(dbUrl, dbDatabase);
+    const dbCertificate = configService.get('DB_CERTIFICATE');
+    if (!dbCertificate) {
+      throw new Error('DB_CERTIFICATE is not provided');
+    }
+
+    this.store = new DocumentStore(dbUrl, dbDatabase, {
+      certificate: dbCertificate,
+      type: 'pem',
+    });
     this.store.conventions.findCollectionNameForObjectLiteral = (entity) => {
       return entity['collection'];
     };
